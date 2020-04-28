@@ -1,35 +1,36 @@
 package com.developersbreach.loginandroid.login
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
-import androidx.activity.addCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.developersbreach.loginandroid.AuthenticationState
 import com.developersbreach.loginandroid.R
+import com.developersbreach.loginandroid.account.AccountViewModel
+import com.developersbreach.loginandroid.model.User
 import com.google.android.material.textfield.TextInputEditText
 
 
 class LoginFragment : Fragment() {
 
-    private val viewModel: LoginViewModel by lazy {
-        ViewModelProvider(this).get(LoginViewModel::class.java)
+    private val viewModel: AccountViewModel by lazy {
+        ViewModelProvider(this).get(AccountViewModel::class.java)
     }
 
-    private lateinit var navController: NavController
     private lateinit var loginButton: Button
     private lateinit var skipButton: Button
     private lateinit var usernameEditText: TextInputEditText
     private lateinit var passwordEditText: TextInputEditText
-
+    private lateinit var user: User
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,67 +46,36 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        navController = findNavController()
 
         loginButton.setOnClickListener {
-            viewModel.authenticate(
-                usernameEditText.text.toString(),
-                passwordEditText.text.toString()
-            )
-        }
-
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            viewModel.refuseAuthentication()
-            navController.popBackStack(R.id.listFragment, false)
+            val username = usernameEditText.text.toString()
+            val password = passwordEditText.text.toString()
+            user = User(username, password)
+            Log.e("VALUES", "$user.username $user.password")
+            //viewModel.verifyUser(user.username, user.password)
         }
 
         viewModel.authenticationState.observe(viewLifecycleOwner, Observer { authenticateState ->
-            when (authenticateState) {
-                AuthenticationState.AUTHENTICATED -> {
-                    Toast.makeText(context, "LOGIN_AUTHENTICATED", Toast.LENGTH_SHORT).show()
-                    navController.popBackStack()
-                }
-
-                AuthenticationState.INVALID_AUTHENTICATION -> {
-                    Toast.makeText(context, "LOGIN_INVALID_AUTHENTICATION", Toast.LENGTH_SHORT)
-                        .show()
-                }
+            if (authenticateState == AuthenticationState.AUTHENTICATED) {
+                Log.e("LoginFragment", "AUTHENTICATED AUTHENTICATED")
+                val action: NavDirections =
+                    LoginFragmentDirections.actionLoginFragmentToListFragment(
+                        user.username, user.password
+                    )
+                Navigation.findNavController(view).navigate(action)
+            } else if (authenticateState == AuthenticationState.UNAUTHENTICATED) {
+                Log.e("LoginFragment", "UNAUTHENTICATED UNAUTHENTICATED")
             }
         })
 
         skipButton.setOnClickListener {
-
+            viewModel.unAuthenticateUser()
+            val action: NavDirections =
+                LoginFragmentDirections.actionLoginFragmentToListFragment(
+                    null, null
+                )
+            Navigation.findNavController(view).navigate(action)
         }
     }
-
-
-
-
-    //        loginButton.setOnClickListener {
-//            viewModel.validateUsername(usernameEditText.text)
-//                .observe(viewLifecycleOwner, Observer { username ->
-//                    validateUserAccount(username, usernameEditText)
-//                })
-//
-//            viewModel.validatePassword(passwordEditText.text)
-//                .observe(viewLifecycleOwner, Observer { password ->
-//                    validateUserAccount(password, passwordEditText)
-//                })
-//        }
-
-//    private fun validateUserAccount(
-//        user: String,
-//        userEditText: TextInputEditText
-//    ) {
-//        if (user.isNotEmpty()) {
-//            if (user.length >= 8) {
-//                Toast.makeText(context, user, Toast.LENGTH_SHORT).show()
-//            } else {
-//                userEditText.error = "Atleast 8 chars required"
-//            }
-//        } else {
-//            userEditText.error = "Field Required"
-//        }
-//    }
-
 }
+

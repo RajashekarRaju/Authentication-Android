@@ -4,24 +4,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph.xml"
-    app:startDestination="@id/listFragment">
-
-    <fragment
-        android:id="@+id/listFragment"
-        android:name="com.developersbreach.loginandroid.list.ListFragment"
-        android:label="List"
-        tools:layout="@layout/fragment_list" />
+    app:startDestination="@id/loginFragment">
 
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.developersbreach.loginandroid.login.LoginFragment"
         android:label="Login"
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_listFragment"
+            app:destination="@id/listFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/listFragment"
+        android:name="com.developersbreach.loginandroid.list.ListFragment"
+        android:label="List"
+        tools:layout="@layout/fragment_list" >
+        <argument
+            android:name="listFragmentUsernameArgs"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="listFragmentPasswordArgs"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_listFragment_to_accountFragment"
+            app:destination="@id/accountFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/accountFragment"
         android:name="com.developersbreach.loginandroid.account.AccountFragment"
         android:label="Account"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_account" >
+        <argument
+            android:name="accountFragmentUsernameArgs"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="accountFragmentPasswordArgs"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 
 </navigation>

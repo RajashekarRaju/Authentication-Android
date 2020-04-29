@@ -8,7 +8,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.NavigationUI
-import com.developersbreach.loginandroid.login.LoginFragmentDirections
 import com.google.android.material.appbar.AppBarLayout
 
 class MainActivity : AppCompatActivity() {

@@ -8,4 +8,5 @@
     <string name="user_login_button_text">Login</string>
     <string name="user_not_logged_in">User not logged in</string>
     <string name="user_logged_out_message">Logged Out Successfully</string>
+    <string name="menu_item_title_account">Account</string>
 </resources>

@@ -4,18 +4,14 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
-import com.developersbreach.loginandroid.AuthenticationState
+import com.developersbreach.loginandroid.authentication.AuthenticationState
 import com.developersbreach.loginandroid.R
-import com.developersbreach.loginandroid.account.AccountViewModel
+import com.developersbreach.loginandroid.authentication.AuthenticationViewModel
 
 
 class ListFragment : Fragment() {
@@ -23,15 +19,15 @@ class ListFragment : Fragment() {
     private lateinit var authTextView: TextView
     private var username: String? = String()
     private var password: String? = String()
-    private val viewModel: AccountViewModel by lazy {
-        ViewModelProvider(this).get(AccountViewModel::class.java)
+    private val viewModel: AuthenticationViewModel by lazy {
+        ViewModelProvider(this).get(AuthenticationViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         username = ListFragmentArgs.fromBundle(requireArguments()).listFragmentUsernameArgs
         password = ListFragmentArgs.fromBundle(requireArguments()).listFragmentPasswordArgs
-        //viewModel.verifyUser(username, password)
+        viewModel.verifyUser(username, password)
         setHasOptionsMenu(true)
     }
 
@@ -58,6 +54,11 @@ class ListFragment : Fragment() {
                 handleBackPress()
             }
         })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.authenticationState.removeObservers(viewLifecycleOwner)
     }
 
     private fun handleBackPress() {

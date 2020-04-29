@@ -10,15 +10,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import com.developersbreach.loginandroid.AuthenticationState
+import com.developersbreach.loginandroid.authentication.AuthenticationState
 import com.developersbreach.loginandroid.R
+import com.developersbreach.loginandroid.authentication.AuthenticationViewModel
 import com.google.android.material.snackbar.Snackbar
 
 
 class AccountFragment : Fragment() {
 
-    private val viewModel: AccountViewModel by lazy {
-        ViewModelProvider(this).get(AccountViewModel::class.java)
+    private val viewModel: AuthenticationViewModel by lazy {
+        ViewModelProvider(this).get(AuthenticationViewModel::class.java)
     }
 
     private var username: String? = String()
@@ -30,7 +31,7 @@ class AccountFragment : Fragment() {
         super.onCreate(savedInstanceState)
         username = AccountFragmentArgs.fromBundle(requireArguments()).accountFragmentUsernameArgs
         password = AccountFragmentArgs.fromBundle(requireArguments()).accountFragmentPasswordArgs
-        //viewModel.verifyUser(username, password)
+        viewModel.verifyUser(username, password)
     }
 
     override fun onCreateView(

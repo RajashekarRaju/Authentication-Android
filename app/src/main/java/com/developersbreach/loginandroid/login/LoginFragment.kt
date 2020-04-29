@@ -9,28 +9,24 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
-import com.developersbreach.loginandroid.AuthenticationState
+import com.developersbreach.loginandroid.authentication.AuthenticationState
 import com.developersbreach.loginandroid.R
-import com.developersbreach.loginandroid.account.AccountViewModel
-import com.developersbreach.loginandroid.model.User
+import com.developersbreach.loginandroid.authentication.AuthenticationViewModel
 import com.google.android.material.textfield.TextInputEditText
 
 
 class LoginFragment : Fragment() {
 
-    private val viewModel: AccountViewModel by lazy {
-        ViewModelProvider(this).get(AccountViewModel::class.java)
+    private val viewModel: AuthenticationViewModel by lazy {
+        ViewModelProvider(this).get(AuthenticationViewModel::class.java)
     }
 
     private lateinit var loginButton: Button
     private lateinit var skipButton: Button
     private lateinit var usernameEditText: TextInputEditText
     private lateinit var passwordEditText: TextInputEditText
-    private lateinit var user: User
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,26 +46,22 @@ class LoginFragment : Fragment() {
         loginButton.setOnClickListener {
             val username = usernameEditText.text.toString()
             val password = passwordEditText.text.toString()
-            user = User(username, password)
-            Log.e("VALUES", "$user.username $user.password")
-            //viewModel.verifyUser(user.username, user.password)
+            viewModel.verifyUser(username, password)
         }
 
         viewModel.authenticationState.observe(viewLifecycleOwner, Observer { authenticateState ->
             if (authenticateState == AuthenticationState.AUTHENTICATED) {
-                Log.e("LoginFragment", "AUTHENTICATED AUTHENTICATED")
                 val action: NavDirections =
                     LoginFragmentDirections.actionLoginFragmentToListFragment(
-                        user.username, user.password
+                        usernameEditText.text.toString() ,passwordEditText.text.toString()
                     )
                 Navigation.findNavController(view).navigate(action)
             } else if (authenticateState == AuthenticationState.UNAUTHENTICATED) {
-                Log.e("LoginFragment", "UNAUTHENTICATED UNAUTHENTICATED")
+                Log.e("LoginFragment", "UNAUTHENTICATED")
             }
         })
 
         skipButton.setOnClickListener {
-            viewModel.unAuthenticateUser()
             val action: NavDirections =
                 LoginFragmentDirections.actionLoginFragmentToListFragment(
                     null, null

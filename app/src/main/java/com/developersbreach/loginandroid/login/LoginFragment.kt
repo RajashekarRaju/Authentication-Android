@@ -6,21 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
-import com.developersbreach.loginandroid.authentication.AuthenticationState
 import com.developersbreach.loginandroid.R
-import com.developersbreach.loginandroid.authentication.AuthenticationViewModel
+import com.developersbreach.loginandroid.account.AccountViewModel
+import com.developersbreach.loginandroid.authentication.AuthenticationState
 import com.google.android.material.textfield.TextInputEditText
 
 
 class LoginFragment : Fragment() {
 
-    private val viewModel: AuthenticationViewModel by lazy {
-        ViewModelProvider(this).get(AuthenticationViewModel::class.java)
+    private val viewModel: AccountViewModel by lazy {
+        ViewModelProvider(this).get(AccountViewModel::class.java)
     }
 
     private lateinit var loginButton: Button
@@ -40,34 +41,36 @@ class LoginFragment : Fragment() {
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        observeAuthenticationState(requireView())
 
-        loginButton.setOnClickListener {
-            val username = usernameEditText.text.toString()
-            val password = passwordEditText.text.toString()
+        loginButton.setOnClickListener { view ->
+            val username: String = usernameEditText.text.toString()
+            val password: String = passwordEditText.text.toString()
             viewModel.verifyUser(username, password)
+            // TODO navigate with conditional navigation
+            //navigateToListFragment(view)
+            observeAuthenticationState(requireView())
         }
 
+        skipButton.setOnClickListener { view -> navigateToListFragment(view) }
+    }
+
+    private fun observeAuthenticationState(view: View) {
         viewModel.authenticationState.observe(viewLifecycleOwner, Observer { authenticateState ->
             if (authenticateState == AuthenticationState.AUTHENTICATED) {
-                val action: NavDirections =
-                    LoginFragmentDirections.actionLoginFragmentToListFragment(
-                        usernameEditText.text.toString() ,passwordEditText.text.toString()
-                    )
-                Navigation.findNavController(view).navigate(action)
+                navigateToListFragment(view)
             } else if (authenticateState == AuthenticationState.UNAUTHENTICATED) {
-                Log.e("LoginFragment", "UNAUTHENTICATED")
+                Toast.makeText(context, "NO_AUTHENTICATION", Toast.LENGTH_SHORT).show()
             }
         })
+    }
 
-        skipButton.setOnClickListener {
-            val action: NavDirections =
-                LoginFragmentDirections.actionLoginFragmentToListFragment(
-                    null, null
-                )
-            Navigation.findNavController(view).navigate(action)
-        }
+    private fun navigateToListFragment(view: View) {
+        val action: NavDirections =
+            LoginFragmentDirections.actionLoginFragmentToListFragment()
+        Navigation.findNavController(view).navigate(action)
     }
 }
 

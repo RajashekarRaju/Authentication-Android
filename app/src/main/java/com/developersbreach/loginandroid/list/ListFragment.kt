@@ -1,7 +1,9 @@
 package com.developersbreach.loginandroid.list
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -9,25 +11,20 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import com.developersbreach.loginandroid.authentication.AuthenticationState
 import com.developersbreach.loginandroid.R
-import com.developersbreach.loginandroid.authentication.AuthenticationViewModel
+import com.developersbreach.loginandroid.account.AccountViewModel
+import com.developersbreach.loginandroid.authentication.AuthenticationState
 
 
 class ListFragment : Fragment() {
 
     private lateinit var authTextView: TextView
-    private var username: String? = String()
-    private var password: String? = String()
-    private val viewModel: AuthenticationViewModel by lazy {
-        ViewModelProvider(this).get(AuthenticationViewModel::class.java)
+    private val viewModel: AccountViewModel by lazy {
+        ViewModelProvider(this).get(AccountViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        username = ListFragmentArgs.fromBundle(requireArguments()).listFragmentUsernameArgs
-        password = ListFragmentArgs.fromBundle(requireArguments()).listFragmentPasswordArgs
-        viewModel.verifyUser(username, password)
         setHasOptionsMenu(true)
     }
 
@@ -47,18 +44,13 @@ class ListFragment : Fragment() {
 
         viewModel.authenticationState.observe(viewLifecycleOwner, Observer { authenticateState ->
             if (authenticateState == AuthenticationState.AUTHENTICATED) {
-                authTextView.text = "AUTHENTICATED \n $username  $password"
+                authTextView.text = "AUTHENTICATED"
                 handleBackPress()
             } else if (authenticateState == AuthenticationState.UNAUTHENTICATED) {
-                authTextView.text = "UN-AUTHENTICATED \n $username  $password"
+                authTextView.text = "UN-AUTHENTICATED"
                 handleBackPress()
             }
         })
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.authenticationState.removeObservers(viewLifecycleOwner)
     }
 
     private fun handleBackPress() {
@@ -78,9 +70,7 @@ class ListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.accountFragment) {
             val action =
-                ListFragmentDirections.actionListFragmentToAccountFragment(
-                    username, password
-                )
+                ListFragmentDirections.actionListFragmentToAccountFragment()
             Navigation.findNavController(requireView()).navigate(action)
         }
 

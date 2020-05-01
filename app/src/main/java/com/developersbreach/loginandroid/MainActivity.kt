@@ -2,10 +2,13 @@ package com.developersbreach.loginandroid
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
+import androidx.navigation.Navigation
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.appbar.AppBarLayout
@@ -49,11 +52,21 @@ class MainActivity : AppCompatActivity() {
             }
             else -> {
                 mAppBarLayout.visibility = View.VISIBLE
-                mToolbar.setNavigationOnClickListener {
-                    mNavigationController.navigateUp()
+                mToolbar.setNavigationOnClickListener { view ->
+                    handleBackPress(view)
                 }
             }
         }
+    }
+
+    private fun handleBackPress(view: View) {
+        onBackPressedDispatcher.addCallback(object :
+            OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                Navigation.findNavController(view).navigate(R.id.listFragment)
+                Toast.makeText(applicationContext, "Pressed", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     override fun onSupportNavigateUp(): Boolean {

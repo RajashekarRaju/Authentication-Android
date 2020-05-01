@@ -1,7 +1,6 @@
 package com.developersbreach.loginandroid.list
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -12,20 +11,18 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.developersbreach.loginandroid.R
-import com.developersbreach.loginandroid.account.AccountViewModel
 import com.developersbreach.loginandroid.authentication.AuthenticationState
 
 
 class ListFragment : Fragment() {
 
     private lateinit var authTextView: TextView
-    private val viewModel: AccountViewModel by lazy {
-        ViewModelProvider(this).get(AccountViewModel::class.java)
-    }
+    private lateinit var viewModel: ListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        viewModel = ViewModelProvider(this).get(ListViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -34,23 +31,34 @@ class ListFragment : Fragment() {
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_list, container, false)
         authTextView = view.findViewById(R.id.auth_text)
-        setHasOptionsMenu(true)
         return view
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel.authenticationState.observe(viewLifecycleOwner, observer())
+    }
 
-        viewModel.authenticationState.observe(viewLifecycleOwner, Observer { authenticateState ->
+    @SuppressLint("SetTextI18n")
+    private fun observer(): Observer<AuthenticationState> {
+        return Observer { authenticateState ->
             if (authenticateState == AuthenticationState.AUTHENTICATED) {
                 authTextView.text = "AUTHENTICATED"
+                Log.e("onActivityCreated", "AUTHENTICATED")
                 handleBackPress()
             } else if (authenticateState == AuthenticationState.UNAUTHENTICATED) {
                 authTextView.text = "UN-AUTHENTICATED"
+                Log.e("onActivityCreated", "UNAUTHENTICATED")
                 handleBackPress()
             }
-        })
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        authTextView.text = null
+        viewModel.authenticationState.removeObserver(observer())
+        Log.e("ListFragment", "Destroyed")
     }
 
     private fun handleBackPress() {

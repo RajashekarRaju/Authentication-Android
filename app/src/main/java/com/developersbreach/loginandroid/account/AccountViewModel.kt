@@ -1,53 +1,42 @@
 package com.developersbreach.loginandroid.account
 
 import android.app.Application
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.developersbreach.loginandroid.authentication.AuthenticationState
 import com.developersbreach.loginandroid.authentication.PrefUtils
-import com.developersbreach.loginandroid.authentication.PrefUtils.Companion.PREFERENCE_VALUE_DEFAULT_PASSWORD
-import com.developersbreach.loginandroid.authentication.PrefUtils.Companion.PREFERENCE_VALUE_DEFAULT_USERNAME
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 
 class AccountViewModel(application: Application) : AndroidViewModel(application) {
 
-    val authenticationState = MutableLiveData<AuthenticationState>()
-    private var mApplication: Application = application
+    private val _authenticationState = MutableLiveData<AuthenticationState>()
 
+    val authenticationState: MutableLiveData<AuthenticationState>
+        get() = _authenticationState
+
+    private var mApplication: Application = application
+    private var viewModelJob = Job()
+    private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
     init {
-        val username: String? = PrefUtils.getUsernamePrefs(application.applicationContext)
-        val password: String? = PrefUtils.getPasswordPrefs(application.applicationContext)
-        if (!username!!.contentEquals(PREFERENCE_VALUE_DEFAULT_USERNAME) &&
-            !password!!.contentEquals(PREFERENCE_VALUE_DEFAULT_PASSWORD)
-        ) {
-            authenticationState.value = AuthenticationState.AUTHENTICATED
-        } else {
-            authenticationState.value = AuthenticationState.UNAUTHENTICATED
+        coroutineScope.launch {
+            PrefUtils.verifyAuthentication(application, _authenticationState)
         }
     }
 
-    fun verifyUser(username: String, password: String) {
-        if (validateUserAccount(username, password)) {
-            PrefUtils.saveToPreferences(username, password, mApplication.applicationContext)
-            Log.e("AccountViewModel", "$username $password")
-        } else {
-            Toast.makeText(mApplication.applicationContext, "No values Saved", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun validateUserAccount(username: String?, password: String?): Boolean {
-        var result = false
-        if (username != null && password != null) {
-            result = username.length >= 5 && password.length >= 5
-        }
-        return result
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
     }
 
     fun logoutUser() {
-        PrefUtils.removeFromPreferences(mApplication.applicationContext)
-        authenticationState.value = AuthenticationState.UNAUTHENTICATED
+        coroutineScope.launch {
+            PrefUtils.removeFromPreferences(mApplication.applicationContext)
+            _authenticationState.postValue(AuthenticationState.UNAUTHENTICATED)
+        }
     }
 }

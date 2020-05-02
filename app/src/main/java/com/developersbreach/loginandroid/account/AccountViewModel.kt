@@ -13,24 +13,24 @@ import kotlinx.coroutines.launch
 
 class AccountViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _authenticationState = MutableLiveData<AuthenticationState>()
-
-    val authenticationState: MutableLiveData<AuthenticationState>
-        get() = _authenticationState
-
     private var mApplication: Application = application
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
+    private val _authenticationState = MutableLiveData<AuthenticationState>()
+    val authenticationState: MutableLiveData<AuthenticationState>
+        get() = _authenticationState
+
+    private val _username = MutableLiveData<String>()
+    val username: MutableLiveData<String>
+        get() = _username
+
+
     init {
         coroutineScope.launch {
             PrefUtils.verifyAuthentication(application, _authenticationState)
+            _username.postValue(PrefUtils.getUsernamePrefs(application.applicationContext))
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
     }
 
     fun logoutUser() {
@@ -38,5 +38,10 @@ class AccountViewModel(application: Application) : AndroidViewModel(application)
             PrefUtils.removeFromPreferences(mApplication.applicationContext)
             _authenticationState.postValue(AuthenticationState.UNAUTHENTICATED)
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
     }
 }

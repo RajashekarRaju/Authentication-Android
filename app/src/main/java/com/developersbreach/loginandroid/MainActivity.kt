@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity() {
     private fun onDestinationChanged(
         destination: NavDestination
     ) {
-        // Check for destination ArticleDetailFragment, if true hide the navigation view.
         when (destination.id) {
             R.id.loginFragment -> {
                 mAppBarLayout.visibility = View.GONE
@@ -52,10 +51,12 @@ class MainActivity : AppCompatActivity() {
                     onBackPressed()
                 }
             }
+            R.id.detailFragment -> {
+                mAppBarLayout.visibility = View.VISIBLE
+                mToolbar.setNavigationOnClickListener {
+                    mNavigationController.navigateUp()
+                }
+            }
         }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        return mNavigationController.navigateUp()
     }
 }

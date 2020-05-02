@@ -24,6 +24,9 @@
         <action
             android:id="@+id/action_listFragment_to_accountFragment"
             app:destination="@id/accountFragment" />
+        <action
+            android:id="@+id/action_list_to_detail_Fragment"
+            app:destination="@id/detailFragment" />
     </fragment>
 
     <fragment
@@ -31,5 +34,19 @@
         android:name="com.developersbreach.loginandroid.account.AccountFragment"
         android:label="Account"
         tools:layout="@layout/fragment_account" />
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.developersbreach.loginandroid.detail.DetailFragment"
+        android:label="Detail"
+        tools:layout="@layout/fragment_detail" >
+        <argument
+            android:name="detailFragmentArgs"
+            app:argType="com.developersbreach.loginandroid.model.Sports"
+            app:enterAnim="@anim/fragment_close_enter"
+            app:exitAnim="@anim/fragment_close_exit"
+            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:popExitAnim="@anim/fragment_fade_exit" />
+    </fragment>
 
 </navigation>

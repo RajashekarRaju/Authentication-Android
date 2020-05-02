@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,20 +12,22 @@ import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import com.developersbreach.loginandroid.R
 import com.developersbreach.loginandroid.authentication.AuthenticationState
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 
 
 class LoginFragment : Fragment() {
 
-    private lateinit var viewModel: LoginViewModel
     private lateinit var loginButton: Button
     private lateinit var skipButton: Button
     private lateinit var usernameEditText: TextInputEditText
     private lateinit var passwordEditText: TextInputEditText
+    private lateinit var userTextInputLayout: TextInputLayout
+    private lateinit var passwordTextInputLayout: TextInputLayout
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
+    private val viewModel: LoginViewModel by lazy {
+        ViewModelProvider(this).get(LoginViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -38,14 +39,22 @@ class LoginFragment : Fragment() {
         skipButton = view.findViewById(R.id.skip_button)
         usernameEditText = view.findViewById(R.id.user_edit_text)
         passwordEditText = view.findViewById(R.id.password_edit_text)
+        userTextInputLayout = view.findViewById(R.id.user_input_layout)
+        passwordTextInputLayout = view.findViewById(R.id.password_input_layout)
         return view
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.authenticationState.observe(viewLifecycleOwner, observer())
+        viewModel.authenticationState.observe(viewLifecycleOwner, Observer { authenticateState ->
+            if (authenticateState == AuthenticationState.AUTHENTICATED) {
+                navigateToListFragment(requireView())
+            } else if (authenticateState == AuthenticationState.UNAUTHENTICATED) {
+                Snackbar.make(requireView(), getString(R.string.user_not_logged_in), Snackbar.LENGTH_SHORT).show()
+            }
+        })
 
-        loginButton.setOnClickListener { v ->
+        loginButton.setOnClickListener {
             val username: String = usernameEditText.text.toString()
             val password: String = passwordEditText.text.toString()
             viewModel.loginUser(username, password)
@@ -54,25 +63,25 @@ class LoginFragment : Fragment() {
         viewModel.navigateToListFragment.observe(viewLifecycleOwner, Observer { isTrue ->
             if (isTrue) {
                 navigateToListFragment(requireView())
+            } else {
+                setUserTextError()
             }
         })
 
-        skipButton.setOnClickListener { v -> navigateToListFragment(v) }
-    }
-
-    private fun observer(): Observer<AuthenticationState> {
-        return Observer { authenticateState ->
-            if (authenticateState == AuthenticationState.AUTHENTICATED) {
-                navigateToListFragment(requireView())
-            } else if (authenticateState == AuthenticationState.UNAUTHENTICATED) {
-                Toast.makeText(context, "NO_AUTHENTICATION", Toast.LENGTH_SHORT).show()
-            }
+        skipButton.setOnClickListener { view ->
+            navigateToListFragment(view)
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewModel.authenticationState.removeObserver(observer())
+    private fun setUserTextError() {
+        val usernameError: Boolean = viewModel.setUsernameError(usernameEditText)
+        if (usernameError) {
+            usernameEditText.error = getString(R.string.edit_text_char_enter_error)
+        }
+        val passwordError: Boolean = viewModel.setPasswordError(passwordEditText)
+        if (passwordError) {
+            passwordTextInputLayout.error = getString(R.string.edit_text_char_enter_error)
+        }
     }
 
     private fun navigateToListFragment(view: View) {

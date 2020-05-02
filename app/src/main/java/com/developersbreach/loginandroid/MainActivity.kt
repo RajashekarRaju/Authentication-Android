@@ -2,13 +2,10 @@ package com.developersbreach.loginandroid
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.Navigation
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.appbar.AppBarLayout
@@ -27,7 +24,6 @@ class MainActivity : AppCompatActivity() {
         mAppBarLayout = findViewById(R.id.appbar)
         mToolbar = findViewById(R.id.toolbar)
         NavigationUI.setupWithNavController(mToolbar, mNavigationController)
-
         setSupportActionBar(mToolbar)
 
         // Change behaviour of destination view or content based on type of destination is user at.
@@ -50,23 +46,13 @@ class MainActivity : AppCompatActivity() {
                 mToolbar.navigationIcon = null
                 mAppBarLayout.visibility = View.VISIBLE
             }
-            else -> {
+            R.id.accountFragment -> {
                 mAppBarLayout.visibility = View.VISIBLE
-                mToolbar.setNavigationOnClickListener { view ->
-                    handleBackPress(view)
+                mToolbar.setNavigationOnClickListener {
+                    onBackPressed()
                 }
             }
         }
-    }
-
-    private fun handleBackPress(view: View) {
-        onBackPressedDispatcher.addCallback(object :
-            OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                Navigation.findNavController(view).navigate(R.id.listFragment)
-                Toast.makeText(applicationContext, "Pressed", Toast.LENGTH_SHORT).show()
-            }
-        })
     }
 
     override fun onSupportNavigateUp(): Boolean {

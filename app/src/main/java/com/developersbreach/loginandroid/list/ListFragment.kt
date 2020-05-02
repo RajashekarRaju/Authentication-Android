@@ -2,12 +2,14 @@ package com.developersbreach.loginandroid.list
 
 import android.os.Bundle
 import android.view.*
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.developersbreach.loginandroid.R
 import com.developersbreach.loginandroid.authentication.AuthenticationState
 import com.google.android.material.snackbar.Snackbar
@@ -15,9 +17,9 @@ import com.google.android.material.snackbar.Snackbar
 
 class ListFragment : Fragment() {
 
-    private lateinit var authTextView: TextView
+    private lateinit var recyclerView: RecyclerView
 
-    private val viewModel : ListViewModel by lazy {
+    private val viewModel: ListViewModel by lazy {
         ViewModelProvider(this).get(ListViewModel::class.java)
     }
 
@@ -26,7 +28,7 @@ class ListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_list, container, false)
-        authTextView = view.findViewById(R.id.auth_text)
+        recyclerView = view.findViewById(R.id.recycler_view)
         setHasOptionsMenu(true)
         handleBackPress()
         return view
@@ -36,14 +38,34 @@ class ListFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel.authenticationState.observe(viewLifecycleOwner, Observer { authenticateState ->
             if (authenticateState == AuthenticationState.AUTHENTICATED) {
-                viewModel.username.observe(viewLifecycleOwner, Observer { username ->
-                    Snackbar.make(requireView(), "Welcome $username!", Snackbar.LENGTH_SHORT).show()
-                })
+                showData()
             } else if (authenticateState == AuthenticationState.UNAUTHENTICATED) {
-                viewModel.username.observe(viewLifecycleOwner, Observer { username ->
-                    Snackbar.make(requireView(), username, Snackbar.LENGTH_SHORT).show()
-                })
+                showLogin()
             }
+        })
+    }
+
+    private fun showData() {
+        viewModel.username.observe(viewLifecycleOwner, Observer { username ->
+            Snackbar.make(requireView(), "Welcome $username!", Snackbar.LENGTH_LONG).show()
+        })
+
+        viewModel.getSports().observe(viewLifecycleOwner, Observer { sportsList ->
+            val sportsAdapter =
+                SportsAdapter(sportsList, SportsAdapter.OnClickListener { sports ->
+                    val action: NavDirections = ListFragmentDirections.actionListToDetailFragment(sports)
+                    findNavController().navigate(action)
+                })
+            recyclerView.adapter = sportsAdapter
+        })
+    }
+
+    private fun showLogin() {
+        viewModel.username.observe(viewLifecycleOwner, Observer { username ->
+            val loginAction = Snackbar.make(requireView(), username, Snackbar.LENGTH_LONG)
+            loginAction.setAction(getString(R.string.user_login_button_text)) {
+                findNavController().navigate(R.id.loginFragment)
+            }.show()
         })
     }
 

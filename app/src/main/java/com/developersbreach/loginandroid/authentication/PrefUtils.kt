@@ -12,8 +12,8 @@ class PrefUtils {
         private var PREFERENCE_NAME_USER_DETAILS = "pref_key_user"
         private var PREFERENCE_VALUE_USER_USERNAME: String = "username"
         private var PREFERENCE_VALUE_USER_PASSWORD: String = "password"
-        var PREFERENCE_VALUE_DEFAULT_USERNAME: String = "User not logged in"
-        var PREFERENCE_VALUE_DEFAULT_PASSWORD: String = "User not logged in"
+        private var PREFERENCE_VALUE_DEFAULT_USERNAME: String = "User not logged in"
+        private var PREFERENCE_VALUE_DEFAULT_PASSWORD: String = "User not logged in"
 
 
         fun verifyAuthentication(
@@ -66,7 +66,7 @@ class PrefUtils {
             )
         }
 
-        fun getPasswordPrefs(context: Context): String? {
+        private fun getPasswordPrefs(context: Context): String? {
             val sharedPref = context.getSharedPreferences(
                 PREFERENCE_NAME_USER_DETAILS,
                 Context.MODE_PRIVATE

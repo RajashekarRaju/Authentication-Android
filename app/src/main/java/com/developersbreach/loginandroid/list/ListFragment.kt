@@ -1,8 +1,6 @@
 package com.developersbreach.loginandroid.list
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -12,17 +10,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.developersbreach.loginandroid.R
 import com.developersbreach.loginandroid.authentication.AuthenticationState
+import com.google.android.material.snackbar.Snackbar
 
 
 class ListFragment : Fragment() {
 
     private lateinit var authTextView: TextView
-    private lateinit var viewModel: ListViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-        viewModel = ViewModelProvider(this).get(ListViewModel::class.java)
+    private val viewModel : ListViewModel by lazy {
+        ViewModelProvider(this).get(ListViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -31,44 +27,32 @@ class ListFragment : Fragment() {
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_list, container, false)
         authTextView = view.findViewById(R.id.auth_text)
+        setHasOptionsMenu(true)
+        handleBackPress()
         return view
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.authenticationState.observe(viewLifecycleOwner, observer())
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun observer(): Observer<AuthenticationState> {
-        return Observer { authenticateState ->
+        viewModel.authenticationState.observe(viewLifecycleOwner, Observer { authenticateState ->
             if (authenticateState == AuthenticationState.AUTHENTICATED) {
-                authTextView.text = "AUTHENTICATED"
-                Log.e("onActivityCreated", "AUTHENTICATED")
-                handleBackPress()
+                viewModel.username.observe(viewLifecycleOwner, Observer { username ->
+                    Snackbar.make(requireView(), "Welcome $username!", Snackbar.LENGTH_SHORT).show()
+                })
             } else if (authenticateState == AuthenticationState.UNAUTHENTICATED) {
-                authTextView.text = "UN-AUTHENTICATED"
-                Log.e("onActivityCreated", "UNAUTHENTICATED")
-                handleBackPress()
-            }
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        authTextView.text = null
-        viewModel.authenticationState.removeObserver(observer())
-        Log.e("ListFragment", "Destroyed")
-    }
-
-    private fun handleBackPress() {
-        requireActivity().onBackPressedDispatcher.addCallback(object :
-            OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                requireActivity().finish()
+                viewModel.username.observe(viewLifecycleOwner, Observer { username ->
+                    Snackbar.make(requireView(), username, Snackbar.LENGTH_SHORT).show()
+                })
             }
         })
     }
+
+    private fun handleBackPress() = requireActivity().onBackPressedDispatcher.addCallback(object :
+        OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            requireActivity().finish()
+        }
+    })
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_account, menu)

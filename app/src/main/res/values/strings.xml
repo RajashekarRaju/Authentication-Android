@@ -250,5 +250,12 @@
         electronic review technology coupled with a point-challenge system, which allows a player to
         contest the line call of a point, a system known as Hawk-Eye.
     </string>
+    <string name="new_user_register">New User? Register</string>
+    <string name="register_user_here">Here</string>
+    <string name="register_user_button_text">Register</string>
+    <string name="hint_first_name">First Name</string>
+    <string name="hint_last_name">Last Name</string>
+    <string name="hint_mail">Email</string>
+    <string name="hint_country">Country</string>
 
 </resources>

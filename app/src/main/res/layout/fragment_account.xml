@@ -38,4 +38,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/user_register_button"
+        android:text="@string/register_user_button_text"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="?attr/colorSecondary"
+        app:layout_constraintStart_toStartOf="@id/user_logout_button"
+        app:layout_constraintEnd_toEndOf="@id/user_logout_button"
+        app:layout_constraintTop_toBottomOf="@id/user_logout_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

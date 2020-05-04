@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +26,7 @@ class LoginFragment : Fragment() {
     private lateinit var passwordEditText: TextInputEditText
     private lateinit var userTextInputLayout: TextInputLayout
     private lateinit var passwordTextInputLayout: TextInputLayout
+    private lateinit var registerUserTextView: TextView
 
     private val viewModel: LoginViewModel by lazy {
         ViewModelProvider(this).get(LoginViewModel::class.java)
@@ -41,6 +43,7 @@ class LoginFragment : Fragment() {
         passwordEditText = view.findViewById(R.id.password_edit_text)
         userTextInputLayout = view.findViewById(R.id.user_input_layout)
         passwordTextInputLayout = view.findViewById(R.id.password_input_layout)
+        registerUserTextView = view.findViewById(R.id.register_user)
         return view
     }
 
@@ -70,6 +73,12 @@ class LoginFragment : Fragment() {
 
         skipButton.setOnClickListener { view ->
             navigateToListFragment(view)
+        }
+
+        registerUserTextView.setOnClickListener { view ->
+            val action: NavDirections =
+                LoginFragmentDirections.actionLoginFragmentToRegisterFragment()
+            Navigation.findNavController(view).navigate(action)
         }
     }
 

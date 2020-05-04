@@ -10,7 +10,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.developersbreach.loginandroid.R
 import com.developersbreach.loginandroid.authentication.AuthenticationState
 import com.google.android.material.snackbar.Snackbar
@@ -20,6 +22,7 @@ class AccountFragment : Fragment() {
 
     private lateinit var userTextView: TextView
     private lateinit var logoutButton: Button
+    private lateinit var registerButton: Button
 
     private val viewModel: AccountViewModel by lazy {
         ViewModelProvider(this).get(AccountViewModel::class.java)
@@ -32,6 +35,8 @@ class AccountFragment : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_account, container, false)
         userTextView = view.findViewById(R.id.user_id)
         logoutButton = view.findViewById(R.id.user_logout_button)
+        registerButton = view.findViewById(R.id.user_register_button)
+        handleBackPress()
         return view
     }
 
@@ -47,8 +52,13 @@ class AccountFragment : Fragment() {
             } else if (authenticationState == AuthenticationState.UNAUTHENTICATED) {
                 setLoginState()
             }
-            handleBackPress()
         })
+
+        registerButton.setOnClickListener { view ->
+            val action: NavDirections =
+                AccountFragmentDirections.actionAccountFragmentToRegisterFragment()
+            Navigation.findNavController(view).navigate(action)
+        }
     }
 
     private fun setLoginState() {
@@ -75,7 +85,7 @@ class AccountFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(object :
             OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                Navigation.findNavController(requireView()).navigate(R.id.listFragment)
+                findNavController().navigate(R.id.listFragment)
             }
         })
     }

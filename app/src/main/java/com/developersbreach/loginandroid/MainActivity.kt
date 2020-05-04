@@ -1,5 +1,6 @@
 package com.developersbreach.loginandroid
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -56,6 +57,9 @@ class MainActivity : AppCompatActivity() {
                 mToolbar.setNavigationOnClickListener {
                     mNavigationController.navigateUp()
                 }
+            }
+            R.id.registerFragment -> {
+                mAppBarLayout.visibility = View.GONE
             }
         }
     }

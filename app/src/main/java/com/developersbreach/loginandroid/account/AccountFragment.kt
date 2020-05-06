@@ -67,6 +67,7 @@ class AccountFragment : Fragment() {
         logoutButton.setOnClickListener { view ->
             Navigation.findNavController(view).navigate(R.id.loginFragment)
         }
+        registerButton.visibility = View.VISIBLE
     }
 
     private fun setLogoutState() {
@@ -79,6 +80,7 @@ class AccountFragment : Fragment() {
                 Snackbar.LENGTH_SHORT
             ).show()
         }
+        registerButton.visibility = View.GONE
     }
 
     private fun handleBackPress() {

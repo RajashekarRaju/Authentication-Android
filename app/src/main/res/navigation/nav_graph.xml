@@ -60,6 +60,10 @@
         android:id="@+id/registerFragment"
         android:name="com.developersbreach.loginandroid.register.RegisterFragment"
         android:label="Register"
-        tools:layout="@layout/fragment_register" />
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_register_to_list_Fragment"
+            app:destination="@id/listFragment" />
+    </fragment>
 
 </navigation>

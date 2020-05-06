@@ -1,6 +1,5 @@
 package com.developersbreach.loginandroid
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -59,7 +58,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             R.id.registerFragment -> {
-                mAppBarLayout.visibility = View.GONE
+                mToolbar.navigationIcon = resources.getDrawable(R.drawable.ic_close, null)
+                mAppBarLayout.visibility = View.VISIBLE
+                mToolbar.setNavigationOnClickListener {
+                    mNavigationController.navigateUp()
+                }
             }
         }
     }
